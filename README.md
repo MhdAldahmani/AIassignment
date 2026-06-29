@@ -68,36 +68,5 @@ Open the notebooks in this order:
 1. `assignment.ipynb`
 2. `qa_demo.ipynb`
 
-`assignment.ipynb` is the business-analysis deliverable.  
+`assignment.ipynb` is the data analysis deliverable.  
 `qa_demo.ipynb` is the interactive system and evaluation showcase.
-
-## Tests
-
-Run the automated tests with:
-
-```bash
-python -m unittest discover -s tests -p "test_*.py" -v
-```
-
-## Evaluation
-
-Deterministic evaluation:
-
-```python
-from src.evaluation import load_evaluation_cases, run_evaluation
-from src.qa import build_qa_engine
-
-engine = build_qa_engine(dataset_path="DisneylandReviews.csv")
-cases = load_evaluation_cases()
-results = run_evaluation(engine, cases, use_llm_judge=False)
-```
-
-Enable the LLM judge only when you want an answer-quality check and have an API key configured. The judge model is separate from the answer model by default.
-
-## Limitations
-
-- The dataset is historical and not a live operations feed.
-- Simple calendar seasons do not capture local climate or holiday effects.
-- Aspect tagging in the analysis notebook is intentionally lightweight and explainable.
-- Questions that require ticket prices, weather, holidays, or live crowd levels are explicitly treated as unsupported external context.
-- LLM-as-a-judge is useful as a consistency check, not as unquestionable ground truth.
