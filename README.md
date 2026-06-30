@@ -1,72 +1,22 @@
-# Disneyland Review Analytics And QA
+# Disneyland Reviews — AI Assignment
 
-This repository packages a take-home style analysis of Disneyland customer reviews and a grounded natural-language QA prototype built on the same cleaned dataset.
+LLM-powered analysis of 42,636 customer reviews across three Disneyland parks (California, Paris, Hong Kong).
 
-Two notebooks are the main entry points:
+## Pipeline
 
-- `assignment.ipynb`: business-facing analysis covering cleaning, metadata exploration, text-based insights, recommendations, system overview, and a short evaluation summary.
-- `qa_demo.ipynb`: interactive QA showcase with planner inspection, deterministic analytics, Chroma retrieval evidence, optional judge scoring, and a small benchmark.
-
-![Adaptive analytical RAG architecture](docs/architecture.svg)
-
-The core design principle is:
-
-> Code calculates the facts, embeddings retrieve the evidence, and the LLM explains the result.
-
-## Architecture
-
-Question  
-→ LLM structured planner  
-→ LangGraph orchestration  
-→ pandas deterministic analytics  
-→ Chroma semantic retrieval  
-→ grounded LLM answer
-
-Why the design moved beyond TF-IDF-only retrieval:
-
-- TF-IDF is useful for lexical overlap, but it struggles on analytical questions like “best time to visit” that require comparisons and rankings before retrieval.
-- Chroma plus embeddings improves semantic evidence retrieval.
-- Embeddings do not replace analytics; `pandas` remains the source of truth for counts, averages, rankings, and comparisons.
-
-## Setup
-
-1. Create a Python environment and install dependencies:
-
-```bash
-pip install -r requirements.txt
+```
+Raw CSV → Clean → LLM Enrichment → Insights & Q&A Endpoint
 ```
 
-2. Copy the example environment file and set your key when you want planner and answer-model calls:
-
-```bash
-cp .env.example .env
-```
-
-3. Set or export `OPENAI_API_KEY`.
-
-The main configurable variables are:
-
-- `OPENAI_API_KEY`
-- `PLANNER_MODEL`
-- `ANSWER_MODEL`
-- `JUDGE_MODEL`
-- `EMBEDDING_PROVIDER`
-- `OPENAI_EMBEDDING_MODEL`
-- `LOCAL_EMBEDDING_MODEL`
-
-## Chroma Index
-
-The vector index persists locally under `artifacts/chroma/disney_reviews`.
-
-- If a valid index already exists, the code reuses it.
-- If the dataset fingerprint or embedding configuration changes, the index is rebuilt automatically.
+1. **Clean** — fix encoding, remove duplicates, parse dates into year/month/season.
+2. **Enrich** — run every review through an LLM (Groq / `openai/gpt-oss-20b`) to tag 9 aspects (queues, staff, price, food, rides, cleanliness, crowding, weather, accessibility) with per-aspect sentiment and a short complaint/delight phrase. Results are cached to disk so this one-time step never reruns.
+3. **Index** — embed all reviews locally with `BAAI/bge-m3` (MPS GPU) and store in Chroma with the enriched metadata as filterable fields.
+4. **Ask** — a natural-language question becomes a structured filter (branch, country, season, aspect tags…) extracted by an LLM, applied to the DataFrame for real aggregate stats, and to Chroma for representative quoted snippets. A final LLM call synthesizes the answer, grounded only in that computed evidence.
 
 ## Notebooks
 
-Open the notebooks in this order:
+| Notebook | What it shows |
+|---|---|
+| `01_analysis.ipynb` | Data cleaning summary + 6 text-grounded, actionable CX insights (e.g. Paris staff 51% negative, California Winter worst for crowds, "friendly staff" is both the #1 delight driver and #2 complaint source) |
+| `02_rag_endpoint.ipynb` | How the Q&A pipeline works, a worked example, 25-question evaluation (100% filter accuracy, 5.0/5 relevance, 3.32/5 faithfulness), and a free-form question cell to try your own questions |
 
-1. `assignment.ipynb`
-2. `qa_demo.ipynb`
-
-`assignment.ipynb` is the data analysis deliverable.  
-`qa_demo.ipynb` is the interactive system and evaluation showcase.

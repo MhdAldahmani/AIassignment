@@ -1,0 +1,17 @@
+pandas>=2.2
+numpy>=1.26
+matplotlib>=3.8
+scikit-learn>=1.4
+python-dotenv>=1.0
+nbformat>=5.10
+nbclient>=0.10
+ipykernel>=6.29
+pydantic>=2.7
+openai>=1.35
+langchain>=0.3
+langgraph>=0.2
+langchain-openai>=0.2
+langchain-chroma>=0.1
+chromadb>=0.5
+sentence-transformers>=3.0
+tqdm>=4.66

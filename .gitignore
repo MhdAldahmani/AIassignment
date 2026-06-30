@@ -1,12 +1,5 @@
+.env
+data/clean/
 __pycache__/
 *.pyc
-.pytest_cache/
 .ipynb_checkpoints/
-.env
-.venv/
-venv/
-ENV/
-env/
-artifacts/chroma/
-artifacts/evaluation_results.csv
-artifacts/evaluation_results.json
